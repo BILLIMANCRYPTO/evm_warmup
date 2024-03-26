@@ -9,6 +9,9 @@ from modules.rainbow_bridge import rainbow_bridge
 from modules.send_mail import send_mail
 from modules.blur_deposit import blur_deposit
 from modules.send_gnosis import send_gnosis
+from modules.radiant import radiant
+from modules.santiment import santiment
+from modules.weth_arb import weth_arb
 from settings import MIN_DELAY, MAX_DELAY, MIN_SEND, MAX_SEND, GAS_PRICE
 from modules.utils import rpc_endpoints
 from modules.chains import chain_ids
@@ -41,6 +44,7 @@ network_choice = input("""
 - Eth sendMail (1) 
 - Gnosis sendMail (2)
 - Eth Pro Mode (3)
+- Arbitrum WarmUp (4)
 : """).lower()
 
 # Проверка корректности выбора сети
@@ -70,14 +74,12 @@ wallets = [Account.from_key(private_key).address for private_key in private_keys
 
 web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
 
-# Отправка транзакции с каждого кошелька
 for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1):
-    # Проверка цены газа перед каждой транзакцией
-    if network_choice == "1" or network_choice == "3":
-        check_gwei(web3, GAS_PRICE) # gwei настройка
+    if network_choice in ["1", "3", "4"]:
+        check_gwei(web3, GAS_PRICE)
 
     if network_choice == "1":
-        threshold_gwei = GAS_PRICE  # gwei настройка
+        threshold_gwei = GAS_PRICE
         check_gwei(web3, threshold_gwei)
         try:
             tx_hash = send_mail(wallet_address, private_key, web3, i, GAS_PRICE)
@@ -90,16 +92,33 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
         except Exception as e:
             print(f"Error: {e}. Skipping to the next action.")
             continue
+    elif network_choice == "4":
+        threshold_gwei = GAS_PRICE
+        check_gwei(web3, threshold_gwei)  # Вызываем check_gwei() для чека газа в 4 модуле
+        modules = ["radiant", "santiment", "weth_arb"]
+        selected_modules = random.choices(modules, k=random.randint(1, len(modules)))
+        random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
+        for module_type in selected_modules:
+            try:
+                if module_type == "radiant":
+                    tx_hash = radiant(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "santiment":
+                    tx_hash = santiment(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "weth_arb":
+                    tx_hash = weth_arb(wallet_address, private_key, web3, i, GAS_PRICE)
+                time.sleep(random_sleep_duration)
+                print(f'Waiting for {random_sleep_duration} seconds before processing next action...')
+            except Exception as e:
+                print(f"Error: {e}. Skipping to the next action.")
+                continue
     elif network_choice == "3":
-        threshold_gwei = GAS_PRICE  # gwei настройка
+        threshold_gwei = GAS_PRICE
+        check_gwei(web3, threshold_gwei)
         modules = ["rainbow_bridge", "blur_deposit"]
-        # Случайный выбор модулей из списка
         selected_modules = random.sample(modules, random.randint(1, len(modules)))
-        # Вставляем send_mail в случайное место в списке
-        # selected_modules = random.sample(modules, random.randint(1, len(modules))) как убрать этот модуль 
-        send_mail_index = random.randint(0, len(selected_modules)) # это можно убрать, если нужно обязательное исполнение модуля 
-        selected_modules.insert(send_mail_index, "send_mail") # это можно убрать, если нужно обязательное исполнение модуля
-        random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)  # Случайная задержка от 100 до 200 секунд
+        send_mail_index = random.randint(0, len(selected_modules))
+        selected_modules.insert(send_mail_index, "send_mail")
+        random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
         for module_type in selected_modules:
             try:
                 if module_type == "send_mail":
@@ -122,9 +141,9 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
     else:
         print(f'Skipping wallet {wallet_address} due to error.')
 
-    # Рандомное время ожидания между 500 и 1000 секундами перед следующей транзакцией
     delay_before_next_wallet = random.randint(MIN_DELAY, MAX_DELAY)
     print(f'Waiting for {delay_before_next_wallet} seconds before processing next wallet...')
     time.sleep(delay_before_next_wallet)
 
 print("Transaction processing completed for all wallets.")
+
