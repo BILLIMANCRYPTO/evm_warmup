@@ -43,7 +43,7 @@ def santiment(wallet_address, private_key, web3, i, GAS_PRICE):
     })
 
     print(f'Start with wallet [{i}/{len(wallets)}]: {wallet_address}')
-    print(f'Deposit Santiment {web3.from_wei(payable_amount, "ether")} eth')
+    print(Fore.CYAN + f'Deposit Santiment {web3.from_wei(payable_amount, "ether")} eth')
     try:
         tx_params = {
             'nonce': nonce,

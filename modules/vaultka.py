@@ -14,16 +14,16 @@ from modules.chains import chain_ids
 with open('abi.json', 'r') as f:
     abi_data = json.load(f)
 
-weth_contract_abi = abi_data['weth']
-weth_contract_address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"  # Адрес контракта
+vaultka_contract_abi = abi_data['vaultka']
+vaultka_contract_address = "0x8A98929750e6709Af765F976c6bddb5BfFE6C06c"  # Адрес контракта
 
 # Генерация кошельков из приватных ключей
 wallets = [Account.from_key(private_key).address for private_key in private_keys]
 
 # Send_mail
-def weth_arb(wallet_address, private_key, web3, i, GAS_PRICE):
+def vaultka_deposit(wallet_address, private_key, web3, i, GAS_PRICE):
     # Инициализация контракта
-    weth_contract = web3.eth.contract(address=web3.to_checksum_address(weth_contract_address), abi=weth_contract_abi)
+    vaultka_contract = web3.eth.contract(address=web3.to_checksum_address(vaultka_contract_address), abi=vaultka_contract_abi)
 
     # Work contract
     nonce = web3.eth.get_transaction_count(wallet_address)
@@ -37,21 +37,21 @@ def weth_arb(wallet_address, private_key, web3, i, GAS_PRICE):
     payable_amount = web3.to_wei(random.uniform(MIN_SEND, MAX_SEND), 'ether')
     gas_limit = web3.eth.estimate_gas({
         'from': wallet_address,
-        'to': weth_contract_address,
+        'to': vaultka_contract_address,
         'value': payable_amount,
-        'data': weth_contract.encodeABI(fn_name='deposit'),
+        'data': vaultka_contract.encodeABI(fn_name='depositETH'),
     })
 
     print(f'Start with wallet [{i}/{len(wallets)}]: {wallet_address}')
-    print(Fore.CYAN + f'WRAP {web3.from_wei(payable_amount, "ether")} eth to WETH')
+    print(Fore.CYAN + f'Deposit Vaultka {web3.from_wei(payable_amount, "ether")} eth')
     try:
         tx_params = {
             'nonce': nonce,
             'gasPrice': gas_price,
             'gas': gas_limit,
-            'to': weth_contract_address,
+            'to': vaultka_contract_address,
             'value': payable_amount,
-            'data': weth_contract.encodeABI(fn_name='deposit'),
+            'data': vaultka_contract.encodeABI(fn_name='depositETH'),
             'chainId': 42161,  # ID сети ARB
         }
 
