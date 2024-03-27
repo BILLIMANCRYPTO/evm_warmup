@@ -1,6 +1,4 @@
-## Модуль Eth sendMail
-
-Модуль Eth sendMail предназначен для отправки SMS-сообщений через сеть Ethereum.
+## Succinct.xyz // demo.telepathy.xyz
 
 ### Описание модулей
 
