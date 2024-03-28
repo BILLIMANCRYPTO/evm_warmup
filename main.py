@@ -22,6 +22,14 @@ from modules.granary import granary
 from modules.rari_bridge import rari_bridge
 from modules.balancer import balancer
 
+# модули Optimism
+from modules.aave_op import aave_op_deposit
+from modules.exactly import exactly_deposit
+from modules.extrafi import extrafi_deposit
+from modules.unitusdapp import unitus_deposit
+from modules.picka_reward import picka
+
+
 # Settings
 from settings import MIN_DELAY, MAX_DELAY, MIN_SEND, MAX_SEND, GAS_PRICE
 from modules.utils import rpc_endpoints
@@ -56,6 +64,7 @@ network_choice = input("""
 - Gnosis sendMail (2)
 - Eth Pro Mode (3)
 - Arbitrum WarmUp (4)
+- Optimism WarmUp (5)
 : """).lower()
 
 # Проверка корректности выбора сети
@@ -70,12 +79,17 @@ if network_choice == "4":
     max_modules = int(input("Максимальное кол-во модулей Arbitrum от 1 до 9: "))
     max_modules = min(max(max_modules, 1), 9)
 
+elif network_choice == "5":
+    max_modules = int(input("Максимальное кол-во модулей Optimism от 1 до 5: "))
+    max_modules = min(max(max_modules, 1), 5)
+
+
 elif network_choice == "2":
     try:
         max_repeats = int(input("Максимальное кол-во повторений send_gnosis: "))
     except ValueError:
         print("Введи целое число")
-        exit()
+
 
 
 # Используемый RPC
@@ -122,7 +136,7 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
         try:
             repeats = random.randint(1, max_repeats)
             for _ in range(repeats):
-                tx_hash = send_gnosis(wallet_address, private_key, web3, i)
+                tx_hash = optimism_bridge(wallet_address, private_key, web3, i)
                 delay_between_repeats = random.randint(MIN_DELAY, MAX_DELAY)
                 print(f'Waiting for {delay_between_repeats} seconds before next send_gnosis...')
                 time.sleep(delay_between_repeats)
@@ -181,6 +195,30 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
             except Exception as e:
                 print(f"Error: {e}. Skipping to the next action.")
                 continue
+    elif network_choice == "5":
+        threshold_gwei = GAS_PRICE
+        check_gwei(network_choice, threshold_gwei)
+        modules = ["aave_op_deposit", "exactly_deposit", "extrafi_deposit", "unitus_deposit", "picka"]
+        selected_modules = random.sample(modules, min(random.randint(1, len(modules)), max_modules))
+        for module_type in selected_modules:
+            try:
+                if module_type == "aave_op_deposit":
+                    tx_hash = aave_op_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "exactly_deposit":
+                    tx_hash = exactly_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "extrafi_deposit":
+                    tx_hash = extrafi_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "unitus_deposit":
+                    tx_hash = unitus_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "picka":
+                    tx_hash = picka(wallet_address, private_key, web3, i, GAS_PRICE)
+                random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
+                print(f'Waiting for {random_sleep_duration} seconds before processing next action...')
+                time.sleep(random_sleep_duration)
+            except Exception as e:
+                print(f"Error: {e}. Skipping to the next action.")
+                continue
+
     else:
         print("Invalid network choice")
         break
