@@ -38,7 +38,7 @@ def blur_deposit(wallet_address, private_key, web3, i, GAS_PRICE):
     })
 
     print(f'Start with wallet [{i}/{len(wallets)}]: {wallet_address}')
-    print(f'Blur deposit {web3.from_wei(payable_amount, "ether")} eth')
+    print(Fore.CYAN + f'Blur deposit {web3.from_wei(payable_amount, "ether")} eth')
     try:
         tx_params = {
             'nonce': nonce,

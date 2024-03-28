@@ -48,7 +48,7 @@ def send_gnosis(wallet_address, private_key, web3, i):
     })
 
     print(f'Start with wallet [{i}/{len(wallets)}]: {wallet_address}')
-    print(f"Send Mail to {chain_ids[destination_chain_id]}")
+    print(Fore.CYAN + f"Send Mail to {chain_ids[destination_chain_id]}")
     try:
         tx_params = {
             'nonce': nonce,

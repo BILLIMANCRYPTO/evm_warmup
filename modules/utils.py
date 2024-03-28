@@ -3,5 +3,6 @@ rpc_endpoints = {
     "2": "https://gnosis.drpc.org",
     "3": "https://rpc.ankr.com/eth",
     "4": "https://rpc.ankr.com/arbitrum",
-    "5": "https://optimism.drpc.org"
+    "5": "https://optimism.drpc.org",
+    "6": "https://rpc.ankr/eth"
 }

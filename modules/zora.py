@@ -11,23 +11,16 @@ from modules.keys import private_keys
 # Чтение ABI контрактов из файла abi.json
 with open('abi.json', 'r') as f:
     abi_data = json.load(f)
-
-rainbow_contract_abi = abi_data['rainbow']
-rainbow_contract_address = "0x6BFaD42cFC4EfC96f529D786D643Ff4A8B89FA52"  # Адрес контракта
+    
+zora_contract_abi = abi_data['zora']
+zora_contract_address = "0x1a0ad011913A150f69f6A19DF447A0CfD9551054"
 
 # Генерация кошельков из приватных ключей
 wallets = [Account.from_key(private_key).address for private_key in private_keys]
 
-# RainbowBrdige
-def rainbow_bridge(wallet_address, private_key, web3, i, GAS_PRICE):
-    # Инициализация контракта
-    rainbow_contract = web3.eth.contract(address=web3.to_checksum_address(rainbow_contract_address), abi=rainbow_contract_abi)
-
-    # Удаление префикса "0x" из адреса кошелька
-    wallet_address_clean = wallet_address.lower().lstrip("0x")
-    nearRecipientAccountId = "aurora:" + wallet_address_clean
-    fee = 0
-    
+# Blur Deposit
+def zora_donate(wallet_address, private_key, web3, i, GAS_PRICE):
+    zora_contract = web3.eth.contract(address=web3.to_checksum_address(zora_contract_address), abi=zora_contract_abi)
     nonce = web3.eth.get_transaction_count(wallet_address)
     balance = web3.eth.get_balance(wallet_address)
     if balance <= 0:
@@ -35,25 +28,25 @@ def rainbow_bridge(wallet_address, private_key, web3, i, GAS_PRICE):
         return None
 
     current_gas_price = web3.eth.gas_price
-    gas_price = int(current_gas_price * 1.1)
+    gas_price = int(current_gas_price * 1.05)
     payable_amount = web3.to_wei(random.uniform(MIN_SEND, MAX_SEND), 'ether') # меняй сумму
     gas_limit = web3.eth.estimate_gas({
         'from': wallet_address,
-        'to': rainbow_contract_address,
+        'to': zora_contract_address,
         'value': payable_amount,
-        'data': rainbow_contract.encodeABI(fn_name='depositToNear', args=[nearRecipientAccountId, fee]),
+        'data': zora_contract.encodeABI(fn_name='donateETH'),
     })
 
     print(f'Start with wallet [{i}/{len(wallets)}]: {wallet_address}')
-    print(Fore.CYAN + f'Bridge to Aurora {web3.from_wei(payable_amount, "ether")} eth')
+    print(Fore.CYAN + f'Zora donate {web3.from_wei(payable_amount, "ether")} eth')
     try:
         tx_params = {
             'nonce': nonce,
             'gasPrice': gas_price,
             'gas': gas_limit,
-            'to': rainbow_contract_address,
+            'to': zora_contract_address,
             'value': payable_amount,
-            'data': rainbow_contract.encodeABI(fn_name='depositToNear', args=[nearRecipientAccountId, fee]),
+            'data': zora_contract.encodeABI(fn_name='donateETH'),
             'chainId': 1,  # ID сети ETH
         }
 
