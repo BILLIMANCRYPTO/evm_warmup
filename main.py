@@ -65,9 +65,18 @@ if network_choice not in rpc_endpoints:
 
 # Выбор максимального числа модулей для исполнения
 max_modules = 0
+max_repeats = 0
 if network_choice == "4":
     max_modules = int(input("Максимальное кол-во модулей Arbitrum от 1 до 9: "))
     max_modules = min(max(max_modules, 1), 9)
+
+elif network_choice == "2":
+    try:
+        max_repeats = int(input("Максимальное кол-во повторений send_gnosis: "))
+    except ValueError:
+        print("Введи целое число")
+        exit()
+
 
 # Используемый RPC
 rpc_endpoint = rpc_endpoints[network_choice]
@@ -75,15 +84,21 @@ web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
 
 
 # Чек Gwei
-def check_gwei(web3, threshold_gwei):
-    current_gwei = web3.eth.gas_price / 10**9  # Приведение к нормальному виду
-    if current_gwei > threshold_gwei:
-        print(f"{current_gwei:.2f} gwei > {threshold_gwei} gwei.")
-        while current_gwei > threshold_gwei:
-            time.sleep(30)  # Проверка каждые 10 секунд
-            current_gwei = web3.eth.gas_price / 10**9  # Приведение к нормальному виду
-            print(f"{current_gwei:.2f} gwei > {threshold_gwei} gwei")
-        print(f"{threshold_gwei} gwei. Start working")
+def check_gwei(network_choice, threshold_gwei):
+    # Проверка, является ли выбранная сеть Ethereum
+    if network_choice in ["1", "3", "4"]:
+        rpc_endpoint = "https://rpc.ankr.com/eth"
+        web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
+        current_gwei = web3.eth.gas_price / 10**9  # Приведение к нормальному виду
+        if current_gwei > threshold_gwei:
+            print(f"{current_gwei:.2f} gwei > {threshold_gwei} gwei.")
+            while current_gwei > threshold_gwei:
+                time.sleep(30)  # Проверка каждые 10 секунд
+                current_gwei = web3.eth.gas_price / 10**9  # Приведение к нормальному виду
+                print(f"{current_gwei:.2f} gwei > {threshold_gwei} gwei")
+            print(f"{threshold_gwei} gwei. Start working")
+    else:
+        print("Цена газа не проверяется для выбранной сети.")
 
 
 # Генерация кошельков из приватных ключей
@@ -93,11 +108,11 @@ web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
 
 for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1):
     if network_choice in ["1", "3", "4"]:
-        check_gwei(web3, GAS_PRICE)
+        check_gwei(network_choice, GAS_PRICE)
 
     if network_choice == "1":
         threshold_gwei = GAS_PRICE
-        check_gwei(web3, threshold_gwei)
+        check_gwei(network_choice, threshold_gwei)
         try:
             tx_hash = send_mail(wallet_address, private_key, web3, i, GAS_PRICE)
         except Exception as e:
@@ -105,16 +120,20 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
             continue
     elif network_choice == "2":
         try:
-            tx_hash = send_gnosis(wallet_address, private_key, web3, i)
+            repeats = random.randint(1, max_repeats)
+            for _ in range(repeats):
+                tx_hash = send_gnosis(wallet_address, private_key, web3, i)
+                delay_between_repeats = random.randint(MIN_DELAY, MAX_DELAY)
+                print(f'Waiting for {delay_between_repeats} seconds before next send_gnosis...')
+                time.sleep(delay_between_repeats)
         except Exception as e:
             print(f"Error: {e}. Skipping to the next action.")
             continue
     elif network_choice == "4":
         threshold_gwei = GAS_PRICE
-        check_gwei(web3, threshold_gwei)  # Вызываем check_gwei() для чека газа в 4 модуле
+        check_gwei(network_choice, threshold_gwei)  # Вызываем check_gwei() для чека газа в 4 модуле
         modules = ["radiant", "santiment", "weth_arb", "aave_deposit", "vaultka_deposit", "arbitrum_withdraw", "granary", "rari_bridge", "balancer"]
         selected_modules = random.sample(modules, min(random.randint(1, len(modules)), max_modules))
-        random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
         for module_type in selected_modules:
             try:
                 if module_type == "radiant":
@@ -135,8 +154,9 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
                     tx_hash = rari_bridge(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "weth_arb":
                     tx_hash = weth_arb(wallet_address, private_key, web3, i, GAS_PRICE)
-                time.sleep(random_sleep_duration)
+                random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
                 print(f'Waiting for {random_sleep_duration} seconds before processing next action...')
+                time.sleep(random_sleep_duration)
             except Exception as e:
                 print(f"Error: {e}. Skipping to the next action.")
                 continue
@@ -147,7 +167,6 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
         selected_modules = random.sample(modules, random.randint(1, len(modules)))
         send_mail_index = random.randint(0, len(selected_modules))
         selected_modules.insert(send_mail_index, "send_mail")
-        random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
         for module_type in selected_modules:
             try:
                 if module_type == "send_mail":
@@ -156,8 +175,9 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
                     tx_hash = rainbow_bridge(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "blur_deposit":
                     tx_hash = blur_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
-                time.sleep(random_sleep_duration)
+                random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
                 print(f'Waiting for {random_sleep_duration} seconds before processing next action...')
+                time.sleep(random_sleep_duration)
             except Exception as e:
                 print(f"Error: {e}. Skipping to the next action.")
                 continue
