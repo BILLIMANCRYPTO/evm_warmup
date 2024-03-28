@@ -38,7 +38,7 @@
 
 ## Модуль Ethereum WarmUp
 
-Модуль Optimism WarmUp предоставляет 5 различных модулей для работы с сетью Optimism.
+Модуль Ethereum WarmUp предоставляет 4 различных модулей для работы с сетью Ethereum.
 
 1. Blur deposit
 2. Aurora bridge
