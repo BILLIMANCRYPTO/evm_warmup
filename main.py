@@ -6,34 +6,35 @@ from web3 import Web3
 from colorama import init, Fore
 from eth_account import Account
 # модули Ethereum
-from modules.rainbow_bridge import rainbow_bridge
-from modules.send_mail import send_mail
-from modules.blur_deposit import blur_deposit
-from modules.mint_zerion import zerion_mint
-from modules.zora import zora_donate
+from modules.ethereum.rainbow_bridge import rainbow_bridge
+from modules.ethereum.send_mail import send_mail
+from modules.ethereum.blur_deposit import blur_deposit
+from modules.ethereum.mint_zerion import zerion_mint
+from modules.ethereum.zora import zora_donate
 
 # модули Gnosis
-from modules.send_gnosis import send_gnosis
+from modules.gnosis.send_gnosis import (send_gnosis)
 
 # модули Arbitrum
-from modules.radiant import radiant
-from modules.santiment import santiment
-from modules.aave import aave_deposit
-from modules.weth_arb import weth_arb
-from modules.vaultka import vaultka_deposit
-from modules.arbitrum_bridge import arbitrum_withdraw
-from modules.granary import granary
-from modules.rari_bridge import rari_bridge
-from modules.balancer import balancer
-from modules.arbswap import arb_swap
-from modules.mint_nft_arb import sparta_mint
+from modules.arbitrum.radiant import radiant
+from modules.arbitrum.santiment import santiment
+from modules.arbitrum.aave import aave_deposit
+from modules.arbitrum.weth_arb import weth_arb
+from modules.arbitrum.vaultka import vaultka_deposit
+from modules.arbitrum.arbitrum_bridge import arbitrum_withdraw
+from modules.arbitrum.granary import granary
+from modules.arbitrum.rari_bridge import rari_bridge
+from modules.arbitrum.balancer import balancer
+from modules.arbitrum.arbswap import arb_swap
+from modules.arbitrum.mint_nft_arb import sparta_mint
 
 # модули Optimism
-from modules.aave_op import aave_op_deposit
-from modules.exactly import exactly_deposit
-from modules.extrafi import extrafi_deposit
-from modules.unitusdapp import unitus_deposit
-from modules.picka_reward import picka
+from modules.optimism.aave_op import aave_op_deposit
+from modules.optimism.exactly import exactly_deposit
+from modules.optimism.extrafi import extrafi_deposit
+from modules.optimism.unitusdapp import unitus_deposit
+from modules.optimism.picka_reward import picka
+from modules.optimism.wepiggy import wepiggy_deposit
 
 
 # Settings
@@ -87,8 +88,8 @@ if network_choice == "4":
     max_modules = min(max(max_modules, 1), 11)
 
 elif network_choice == "5":
-    max_modules = int(input("Максимальное кол-во модулей Optimism от 1 до 5: "))
-    max_modules = min(max(max_modules, 1), 5)
+    max_modules = int(input("Максимальное кол-во модулей Optimism от 1 до 6: "))
+    max_modules = min(max(max_modules, 1), 6)
 
 elif network_choice == "6":
     max_modules = int(input("Максимальное кол-во модулей Ethereum от 1 до 4: "))
@@ -219,7 +220,8 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
     elif network_choice == "5":
         threshold_gwei = GAS_PRICE
         check_gwei(network_choice, threshold_gwei)
-        modules = ["aave_op_deposit", "exactly_deposit", "extrafi_deposit", "unitus_deposit", "picka"]
+        modules = ["aave_op_deposit", "exactly_deposit", "extrafi_deposit", "unitus_deposit", "picka", "wepiggy_deposit"]
+        # "aave_op_deposit", "exactly_deposit", "extrafi_deposit", "unitus_deposit", "picka",
         selected_modules = random.sample(modules, min(random.randint(1, len(modules)), max_modules))
         for module_type in selected_modules:
             try:
@@ -231,6 +233,8 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
                     tx_hash = extrafi_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "unitus_deposit":
                     tx_hash = unitus_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "wepiggy_deposit":
+                    tx_hash = wepiggy_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "picka":
                     tx_hash = picka(wallet_address, private_key, web3, i, GAS_PRICE)
                 random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
