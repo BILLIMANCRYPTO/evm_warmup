@@ -83,8 +83,8 @@ if network_choice not in rpc_endpoints:
 max_modules = 0
 max_repeats = 0
 if network_choice == "4":
-    max_modules = int(input("Максимальное кол-во модулей Arbitrum от 1 до 10: "))
-    max_modules = min(max(max_modules, 1), 10)
+    max_modules = int(input("Максимальное кол-во модулей Arbitrum от 1 до 11: "))
+    max_modules = min(max(max_modules, 1), 11)
 
 elif network_choice == "5":
     max_modules = int(input("Максимальное кол-во модулей Optimism от 1 до 5: "))
