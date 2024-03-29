@@ -25,6 +25,8 @@ from modules.arbitrum_bridge import arbitrum_withdraw
 from modules.granary import granary
 from modules.rari_bridge import rari_bridge
 from modules.balancer import balancer
+from modules.arbswap import arb_swap
+from modules.mint_nft_arb import sparta_mint
 
 # модули Optimism
 from modules.aave_op import aave_op_deposit
@@ -35,7 +37,7 @@ from modules.picka_reward import picka
 
 
 # Settings
-from settings import MIN_DELAY, MAX_DELAY, MIN_SEND, MAX_SEND, GAS_PRICE
+from settings import MIN_DELAY, MAX_DELAY, MIN_SEND, MAX_SEND, GAS_PRICE, MIN_SWAP, MAX_SWAP
 from modules.utils import rpc_endpoints
 from modules.chains import chain_ids
 from modules.keys import private_keys
@@ -81,8 +83,8 @@ if network_choice not in rpc_endpoints:
 max_modules = 0
 max_repeats = 0
 if network_choice == "4":
-    max_modules = int(input("Максимальное кол-во модулей Arbitrum от 1 до 9: "))
-    max_modules = min(max(max_modules, 1), 9)
+    max_modules = int(input("Максимальное кол-во модулей Arbitrum от 1 до 10: "))
+    max_modules = min(max(max_modules, 1), 10)
 
 elif network_choice == "5":
     max_modules = int(input("Максимальное кол-во модулей Optimism от 1 до 5: "))
@@ -155,7 +157,8 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
     elif network_choice == "4":
         threshold_gwei = GAS_PRICE
         check_gwei(network_choice, threshold_gwei)  # Вызываем check_gwei() для чека газа в 4 модуле
-        modules = ["radiant", "santiment", "weth_arb", "aave_deposit", "vaultka_deposit", "arbitrum_withdraw", "granary", "rari_bridge", "balancer"]
+        modules = ["radiant", "santiment", "weth_arb", "aave_deposit", "vaultka_deposit", "arbitrum_withdraw", "granary", "rari_bridge", "balancer","arb_swap", "sparta_mint"]
+        # "radiant", "santiment", "weth_arb", "aave_deposit", "vaultka_deposit", "arbitrum_withdraw", "granary", "rari_bridge", "balancer","arb_swap", "sparta_mint"
         selected_modules = random.sample(modules, min(random.randint(1, len(modules)), max_modules))
         for module_type in selected_modules:
             try:
@@ -173,16 +176,25 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
                     tx_hash = granary(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "balancer":
                     tx_hash = balancer(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "arb_swap":
+                    tx_hash = arb_swap(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "rari_bridge":
                     tx_hash = rari_bridge(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "sparta_mint":
+                    tx_hash = sparta_mint(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "weth_arb":
                     tx_hash = weth_arb(wallet_address, private_key, web3, i, GAS_PRICE)
                 random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
                 print(f'Waiting for {random_sleep_duration} seconds before processing next action...')
                 time.sleep(random_sleep_duration)
             except Exception as e:
-                print(f"Error: {e}. Skipping to the next action.")
-                continue
+                if "0x363918c5" in str(e):
+                    print(Fore.YELLOW + "Nft for {wallet_address} already minted")
+                else:
+                    print(f"Error: {e}. Skipping to the next action.")
+                    logging.error(f'Error occurred for wallet {wallet_address}: {str(e)}')
+                    logging.exception("Exception occurred", exc_info=True)
+                    continue
     elif network_choice == "3":
         threshold_gwei = GAS_PRICE
         check_gwei(web3, threshold_gwei)
