@@ -35,6 +35,8 @@
 3. Aave
 4. Unitus dapp
 5. Picka get reward
+6. Wepiigy deposit
+7. Sonne Finance lending
 
 Перед началом работы необходимо выбрать количество модулей, которые будут использованы максимально для каждого кошелька.
 
