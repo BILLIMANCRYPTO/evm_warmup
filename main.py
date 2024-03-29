@@ -35,6 +35,7 @@ from modules.optimism.extrafi import extrafi_deposit
 from modules.optimism.unitusdapp import unitus_deposit
 from modules.optimism.picka_reward import picka
 from modules.optimism.wepiggy import wepiggy_deposit
+from modules.optimism.sonne_dep import sonne_deposit
 
 
 # Settings
@@ -88,8 +89,8 @@ if network_choice == "4":
     max_modules = min(max(max_modules, 1), 11)
 
 elif network_choice == "5":
-    max_modules = int(input("Максимальное кол-во модулей Optimism от 1 до 6: "))
-    max_modules = min(max(max_modules, 1), 6)
+    max_modules = int(input("Максимальное кол-во модулей Optimism от 1 до 7: "))
+    max_modules = min(max(max_modules, 1), 7)
 
 elif network_choice == "6":
     max_modules = int(input("Максимальное кол-во модулей Ethereum от 1 до 4: "))
@@ -131,6 +132,8 @@ def check_gwei(network_choice, threshold_gwei):
 wallets = [Account.from_key(private_key).address for private_key in private_keys]
 
 web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
+
+tx_hash = None
 
 for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1):
     if network_choice in ["1", "3", "4", "6"]:
@@ -220,8 +223,8 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
     elif network_choice == "5":
         threshold_gwei = GAS_PRICE
         check_gwei(network_choice, threshold_gwei)
-        modules = ["aave_op_deposit", "exactly_deposit", "extrafi_deposit", "unitus_deposit", "picka", "wepiggy_deposit"]
-        # "aave_op_deposit", "exactly_deposit", "extrafi_deposit", "unitus_deposit", "picka",
+        modules = ["aave_op_deposit", "exactly_deposit", "extrafi_deposit", "unitus_deposit", "picka", "wepiggy_deposit", "sonne_deposit"]
+        # "aave_op_deposit", "exactly_deposit", "extrafi_deposit", "unitus_deposit", "picka", "wepiggy_deposit", "sonne_deposit"
         selected_modules = random.sample(modules, min(random.randint(1, len(modules)), max_modules))
         for module_type in selected_modules:
             try:
@@ -235,6 +238,8 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
                     tx_hash = unitus_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "wepiggy_deposit":
                     tx_hash = wepiggy_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "sonne_deposit":
+                    tx_hash = sonne_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "picka":
                     tx_hash = picka(wallet_address, private_key, web3, i, GAS_PRICE)
                 random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
