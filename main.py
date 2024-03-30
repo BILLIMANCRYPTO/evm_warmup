@@ -11,6 +11,7 @@ from modules.ethereum.send_mail import send_mail
 from modules.ethereum.blur_deposit import blur_deposit
 from modules.ethereum.mint_zerion import zerion_mint
 from modules.ethereum.zora import zora_donate
+from modules.ethereum.bungee_refuel import bungee_refuel
 
 # модули Gnosis
 from modules.gnosis.send_gnosis import (send_gnosis)
@@ -251,7 +252,7 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
     elif network_choice == "6":
         threshold_gwei = GAS_PRICE
         check_gwei(network_choice, threshold_gwei)
-        modules = ["rainbow_bridge", "blur_deposit", "zerion_mint", "zora_donate"]
+        modules = ["rainbow_bridge", "blur_deposit", "zerion_mint", "zora_donate", "bungee_refuel"]
         selected_modules = random.sample(modules, min(random.randint(1, len(modules)), max_modules))
         for module_type in selected_modules:
             try:
@@ -263,6 +264,8 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
                     tx_hash = zerion_mint(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "zora_donate":
                     tx_hash = zora_donate(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "bungee_refuel":
+                    tx_hash = bungee_refuel(wallet_address, private_key, web3, i, GAS_PRICE)
                 random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
                 print(f'Waiting for {random_sleep_duration} seconds before processing next action...')
                 time.sleep(random_sleep_duration)
