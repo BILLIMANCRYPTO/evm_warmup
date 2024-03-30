@@ -94,8 +94,8 @@ elif network_choice == "5":
     max_modules = min(max(max_modules, 1), 7)
 
 elif network_choice == "6":
-    max_modules = int(input("Максимальное кол-во модулей Ethereum от 1 до 4: "))
-    max_modules = min(max(max_modules, 1), 4)
+    max_modules = int(input("Максимальное кол-во модулей Ethereum от 1 до 5: "))
+    max_modules = min(max(max_modules, 1), 5)
 
 
 elif network_choice == "2":
