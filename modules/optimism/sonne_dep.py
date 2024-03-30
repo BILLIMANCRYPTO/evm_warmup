@@ -16,8 +16,10 @@ with open('abi.json', 'r') as f:
 
 weth_op_contract_abi = abi_data['weth_op']
 sonne_contract_abi = abi_data['sonne_op']
+sonne_coll_contract_abi = abi_data['sonne_coll']
 weth_op_contract_address = "0x4200000000000000000000000000000000000006"
 sonne_contract_address = "0xf7B5965f5C117Eb1B5450187c9DcFccc3C317e8E"
+sonne_coll_contract_address = "0x60CF091cD3f50420d50fD7f707414d0DF4751C58"
 
 # Генерация кошельков из приватных ключей
 wallets = [Account.from_key(private_key).address for private_key in private_keys]
@@ -191,6 +193,63 @@ def sonne_liq(wallet_address, private_key, web3, i, GAS_PRICE, payable_amount):
         logging.exception("Exception occurred", exc_info=True)
         return None
 
+# Sonne colletarl EnterMarkets
+def sonne_enter(wallet_address, private_key, web3, i, GAS_PRICE):
+    sonne_coll_contract = web3.eth.contract(
+        address=web3.to_checksum_address(sonne_coll_contract_address),
+        abi=sonne_coll_contract_abi
+    )
+
+    cTokens = ['0xf7B5965f5C117Eb1B5450187c9DcFccc3C317e8E']
+
+    nonce = web3.eth.get_transaction_count(wallet_address)
+    balance = web3.eth.get_balance(wallet_address)
+    if balance <= 0:
+        logging.error(f"Insufficient balance in wallet {wallet_address}")
+        return None
+
+    current_gas_price = web3.eth.gas_price
+    gas_price = int(current_gas_price * 1.2)
+    gas_limit = web3.eth.estimate_gas({
+        'from': wallet_address,
+        'to': sonne_coll_contract_address,
+        'value': 0,
+        'data': sonne_coll_contract.encodeABI(fn_name='enterMarkets', args=[cTokens]),
+    })
+
+    print(f'Enter Markets with wallet [{i}/{len(wallets)}]: {wallet_address}')
+    print(Fore.CYAN + f'Collateral mode ON')
+    try:
+        tx_params = {
+            'nonce': nonce,
+            'gasPrice': gas_price,
+            'gas': gas_limit,
+            'to': sonne_coll_contract_address,
+            'value': 0,
+            'data': sonne_coll_contract.encodeABI(fn_name='enterMarkets', args=[cTokens]),
+            'chainId': 10,  # ID сети ETH
+        }
+
+        signed_tx = web3.eth.account.sign_transaction(tx_params, private_key)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+        print(f'Transaction sent: {tx_hash.hex()}')
+
+        # Ожидание подтверждения транзакции
+        tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+        if tx_receipt.status == 1:
+            print(Fore.GREEN + f'Transaction {tx_hash.hex()} successfully confirmed')
+        else:
+            print(Fore.RED + f'Transaction {tx_hash.hex()} failed')
+
+        return tx_hash.hex()
+
+    except Exception as e:
+        logging.error(f'Error occurred for wallet {wallet_address}: {e}')
+        logging.exception("Exception occurred", exc_info=True)
+        return None
+
+
 # Функция sonne_deposit
 def sonne_deposit(wallet_address, private_key, web3, i, GAS_PRICE):
     # Вычисление payable_amount
@@ -201,7 +260,9 @@ def sonne_deposit(wallet_address, private_key, web3, i, GAS_PRICE):
         wait_random_time()
         approve_weth(wallet_address, private_key, web3, i, GAS_PRICE)
         wait_random_time()
-        tx_hash = sonne_liq(wallet_address, private_key, web3, i, GAS_PRICE, payable_amount)
+        sonne_liq(wallet_address, private_key, web3, i, GAS_PRICE, payable_amount)
+        wait_random_time()
+        tx_hash = sonne_enter(wallet_address, private_key, web3, i, GAS_PRICE)
 
         # Возвращаем Hash
         return tx_hash
