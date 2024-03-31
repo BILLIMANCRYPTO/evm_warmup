@@ -48,10 +48,12 @@
 2. Aurora bridge
 3. Zerion DNA mint
 4. Donate Zora
-5. Bungee Refuel 
+5. Bungee Refuel
 
 Перед началом работы необходимо выбрать количество модулей, которые будут использованы максимально для каждого кошелька.
 
+## Модуль ENS Domain Renew
+Проделвает ваши активые ENS домены на 1 год
 
 ## Настройка в settings.py
 
