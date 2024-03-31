@@ -12,6 +12,7 @@ from modules.ethereum.blur_deposit import blur_deposit
 from modules.ethereum.mint_zerion import zerion_mint
 from modules.ethereum.zora import zora_donate
 from modules.ethereum.bungee_refuel import bungee_refuel
+from modules.ethereum.ens_renewal import ensdomain_renewal
 
 # модули Gnosis
 from modules.gnosis.send_gnosis import (send_gnosis)
@@ -75,6 +76,7 @@ network_choice = input("""
 - Arbitrum WarmUp (4)
 - Optimism WarmUp (5)
 - Eth WarmUp (6)
+- ENS Domain Renew (7)
 : """).lower()
 
 # Проверка корректности выбора сети
@@ -114,7 +116,7 @@ web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
 # Чек Gwei
 def check_gwei(network_choice, threshold_gwei):
     # Проверка, является ли выбранная сеть Ethereum
-    if network_choice in ["1", "3", "4", "6"]:
+    if network_choice in ["1", "3", "4", "6", "7"]:
         rpc_endpoint = "https://rpc.ankr.com/eth"
         web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
         current_gwei = web3.eth.gas_price / 10**9  # Приведение к нормальному виду
@@ -137,7 +139,7 @@ web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
 tx_hash = None
 
 for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1):
-    if network_choice in ["1", "3", "4", "6"]:
+    if network_choice in ["1", "3", "4", "6", "7"]:
         check_gwei(network_choice, GAS_PRICE)
 
     if network_choice == "1":
@@ -148,13 +150,25 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
         except Exception as e:
             print(f"Error: {e}. Skipping to the next action.")
             continue
+    elif network_choice == "7":
+        threshold_gwei = GAS_PRICE
+        check_gwei(network_choice, threshold_gwei)
+        try:
+            tx_hash = ensdomain_renewal(wallet_address, private_key, web3, i, GAS_PRICE)
+        except Exception as e:
+            if "Exception occurred" in str(e):
+                print(Fore.YELLOW + f"No active Ens domain on the wallet {wallet_address}")
+                continue
+            else:
+                print(f"Error: {e}. Skipping to the next action.")
+                continue
     elif network_choice == "2":
         try:
             repeats = random.randint(1, max_repeats)
             for _ in range(repeats):
                 tx_hash = send_gnosis(wallet_address, private_key, web3, i)
                 delay_between_repeats = random.randint(MIN_DELAY, MAX_DELAY)
-                print(f'Waiting for {delay_between_repeats} seconds before next send_gnosis...')
+                print(f'{"":<7}Waiting for {delay_between_repeats} seconds before next send_gnosis...')
                 time.sleep(delay_between_repeats)
         except Exception as e:
             print(f"Error: {e}. Skipping to the next action.")
@@ -216,7 +230,7 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
                 elif module_type == "blur_deposit":
                     tx_hash = blur_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
-                print(f'Waiting for {random_sleep_duration} seconds before processing next action...')
+                print(f'{"":<7}Waiting for {random_sleep_duration} seconds before processing next action...')
                 time.sleep(random_sleep_duration)
             except Exception as e:
                 print(f"Error: {e}. Skipping to the next action.")
