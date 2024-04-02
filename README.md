@@ -23,6 +23,7 @@
 9. Balancer
 10. ArbSwap [random token]
 11. Mint GameFi NFT
+12. Swap TraderJoe [random token]
 
 Перед началом работы необходимо выбрать количество модулей, которые будут использованы максимально для каждого кошелька.
 
