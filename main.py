@@ -13,6 +13,7 @@ from modules.ethereum.mint_zerion import zerion_mint
 from modules.ethereum.zora import zora_donate
 from modules.ethereum.bungee_refuel import bungee_refuel
 from modules.ethereum.ens_renewal import ensdomain_renewal
+from modules.ethereum.withdraw_ens import ens_withdraw
 
 # модули Gnosis
 from modules.gnosis.send_gnosis import (send_gnosis)
@@ -29,6 +30,7 @@ from modules.arbitrum.rari_bridge import rari_bridge
 from modules.arbitrum.balancer import balancer
 from modules.arbitrum.arbswap import arb_swap
 from modules.arbitrum.mint_nft_arb import sparta_mint
+from modules.arbitrum.traderjoy import traderjoy_swap
 
 # модули Optimism
 from modules.optimism.aave_op import aave_op_deposit
@@ -88,16 +90,16 @@ if network_choice not in rpc_endpoints:
 max_modules = 0
 max_repeats = 0
 if network_choice == "4":
-    max_modules = int(input("Максимальное кол-во модулей Arbitrum от 1 до 11: "))
-    max_modules = min(max(max_modules, 1), 11)
+    max_modules = int(input("Максимальное кол-во модулей Arbitrum от 1 до 12: "))
+    max_modules = min(max(max_modules, 1), 12)
 
 elif network_choice == "5":
     max_modules = int(input("Максимальное кол-во модулей Optimism от 1 до 7: "))
     max_modules = min(max(max_modules, 1), 7)
 
 elif network_choice == "6":
-    max_modules = int(input("Максимальное кол-во модулей Ethereum от 1 до 5: "))
-    max_modules = min(max(max_modules, 1), 5)
+    max_modules = int(input("Максимальное кол-во модулей Ethereum от 1 до 6: "))
+    max_modules = min(max(max_modules, 1), 6)
 
 
 elif network_choice == "2":
@@ -176,15 +178,17 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
     elif network_choice == "4":
         threshold_gwei = GAS_PRICE
         check_gwei(network_choice, threshold_gwei)  # Вызываем check_gwei() для чека газа в 4 модуле
-        modules = ["radiant", "santiment", "weth_arb", "aave_deposit", "vaultka_deposit", "arbitrum_withdraw", "granary", "rari_bridge", "balancer","arb_swap", "sparta_mint"]
+        modules = ["radiant", "santiment", "weth_arb", "aave_deposit", "vaultka_deposit", "arbitrum_withdraw", "granary", "rari_bridge", "balancer","arb_swap", "sparta_mint", "traderjoy_swap"]
         # "radiant", "santiment", "weth_arb", "aave_deposit", "vaultka_deposit", "arbitrum_withdraw", "granary", "rari_bridge", "balancer","arb_swap", "sparta_mint"
         selected_modules = random.sample(modules, min(random.randint(1, len(modules)), max_modules))
         for module_type in selected_modules:
             try:
-                if module_type == "radiant":
-                    tx_hash = radiant(wallet_address, private_key, web3, i, GAS_PRICE)
+                if module_type == "traderjoy_swap":
+                    tx_hash = traderjoy_swap(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "santiment":
                     tx_hash = santiment(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "radiant":
+                    tx_hash = radiant(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "aave_deposit":
                     tx_hash = aave_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "vaultka_deposit":
@@ -209,6 +213,15 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
             except Exception as e:
                 if "0x363918c5" in str(e):
                     print(Fore.YELLOW + "Nft for {wallet_address} already minted")
+                elif "0x4feac00c" in str(e):
+                    print(Fore.YELLOW + "Error occurred, trying another pair...")
+                    try:
+                        tx_hash = traderjoy_swap(wallet_address, private_key, web3, i, GAS_PRICE)
+                    except Exception as e:
+                        print(f"Error occurred during retry: {e}. Skipping to the next action.")
+                        logging.error(f'Error occurred for wallet {wallet_address}: {str(e)}')
+                        logging.exception("Exception occurred", exc_info=True)
+                        continue
                 else:
                     print(f"Error: {e}. Skipping to the next action.")
                     logging.error(f'Error occurred for wallet {wallet_address}: {str(e)}')
@@ -266,7 +279,7 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
     elif network_choice == "6":
         threshold_gwei = GAS_PRICE
         check_gwei(network_choice, threshold_gwei)
-        modules = ["rainbow_bridge", "blur_deposit", "zerion_mint", "zora_donate", "bungee_refuel"]
+        modules = ["rainbow_bridge", "blur_deposit", "zerion_mint", "zora_donate", "bungee_refuel", "ens_withdraw"]
         selected_modules = random.sample(modules, min(random.randint(1, len(modules)), max_modules))
         for module_type in selected_modules:
             try:
@@ -276,6 +289,8 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
                     tx_hash = blur_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "zerion_mint":
                     tx_hash = zerion_mint(wallet_address, private_key, web3, i, GAS_PRICE)
+                elif module_type == "ens_withdraw":
+                    tx_hash = ens_withdraw(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "zora_donate":
                     tx_hash = zora_donate(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "bungee_refuel":
