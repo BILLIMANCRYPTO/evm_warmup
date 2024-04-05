@@ -148,6 +148,7 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
         threshold_gwei = GAS_PRICE
         check_gwei(network_choice, threshold_gwei)
         try:
+            check_gwei(network_choice, threshold_gwei)
             tx_hash = send_mail(wallet_address, private_key, web3, i, GAS_PRICE)
         except Exception as e:
             print(f"Error: {e}. Skipping to the next action.")
@@ -156,6 +157,7 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
         threshold_gwei = GAS_PRICE
         check_gwei(network_choice, threshold_gwei)
         try:
+            check_gwei(network_choice, threshold_gwei)
             tx_hash = ensdomain_renewal(wallet_address, private_key, web3, i, GAS_PRICE)
         except Exception as e:
             if "Exception occurred" in str(e):
@@ -184,28 +186,40 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
         for module_type in selected_modules:
             try:
                 if module_type == "traderjoy_swap":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = traderjoy_swap(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "santiment":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = santiment(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "radiant":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = radiant(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "aave_deposit":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = aave_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "vaultka_deposit":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = vaultka_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "arbitrum_withdraw":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = arbitrum_withdraw(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "granary":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = granary(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "balancer":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = balancer(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "arb_swap":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = arb_swap(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "rari_bridge":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = rari_bridge(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "sparta_mint":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = sparta_mint(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "weth_arb":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = weth_arb(wallet_address, private_key, web3, i, GAS_PRICE)
                 random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
                 print(f'Waiting for {random_sleep_duration} seconds before processing next action...')
@@ -237,10 +251,13 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
         for module_type in selected_modules:
             try:
                 if module_type == "send_mail":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = send_mail(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "rainbow_bridge":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = rainbow_bridge(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "blur_deposit":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = blur_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
                 print(f'{"":<7}Waiting for {random_sleep_duration} seconds before processing next action...')
@@ -284,16 +301,22 @@ for i, (wallet_address, private_key) in enumerate(zip(wallets, private_keys), 1)
         for module_type in selected_modules:
             try:
                 if module_type == "rainbow_bridge":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = rainbow_bridge(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "blur_deposit":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = blur_deposit(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "zerion_mint":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = zerion_mint(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "ens_withdraw":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = ens_withdraw(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "zora_donate":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = zora_donate(wallet_address, private_key, web3, i, GAS_PRICE)
                 elif module_type == "bungee_refuel":
+                    check_gwei(network_choice, threshold_gwei)
                     tx_hash = bungee_refuel(wallet_address, private_key, web3, i, GAS_PRICE)
                 random_sleep_duration = random.randint(MIN_DELAY, MAX_DELAY)
                 print(f'Waiting for {random_sleep_duration} seconds before processing next action...')
