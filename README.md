@@ -10,7 +10,7 @@
 
 ## Модуль Arbitrum WarmUp
 
-Модуль Arbitrum WarmUp предоставляет 9 различных модулей для работы с сетью Arbitrum.
+Модуль Arbitrum WarmUp предоставляет 12 различных модулей для работы с сетью Arbitrum.
 
 1. Radiant.capital
 2. Santiment
@@ -29,7 +29,7 @@
 
 ## Модуль Optimism WarmUp
 
-Модуль Optimism WarmUp предоставляет 5 различных модулей для работы с сетью Optimism.
+Модуль Optimism WarmUp предоставляет 7 различных модулей для работы с сетью Optimism.
 
 1. Exact.ly
 2. Extrafi.io
@@ -43,13 +43,29 @@
 
 ## Модуль Ethereum WarmUp
 
-Модуль Ethereum WarmUp предоставляет 4 различных модулей для работы с сетью Ethereum.
+Модуль Ethereum WarmUp предоставляет 7 различных модулей для работы с сетью Ethereum.
 
 1. Blur deposit
 2. Aurora bridge
 3. Zerion DNA mint
 4. Donate Zora
 5. Bungee Refuel
+6. ENS withdraw (cheap tx)
+7. Zksync Lita bridge
+
+Перед началом работы необходимо выбрать количество модулей, которые будут использованы максимально для каждого кошелька.
+
+## Модуль Scroll WarmUp
+
+Модуль Ethereum WarmUp предоставляет 7 различных модулей для работы с сетью Ethereum.
+
+1. Loanshark deposit
+2. Zksynth deposit
+3. Meowprotocol deposit
+4. Punk Swap [random token]
+5. Compound Proxy Allow
+6. Kelpdao deposit
+7. Kelpdao deposit & swap
 
 Перед началом работы необходимо выбрать количество модулей, которые будут использованы максимально для каждого кошелька.
 
