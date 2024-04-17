@@ -55,36 +55,6 @@
 
 Перед началом работы необходимо выбрать количество модулей, которые будут использованы максимально для каждого кошелька.
 
-## Scroll Volume WarmUp
-
-Модуль Scroll Volume WarmUp предоставляет 3 различных модулей для работы с сетью Scroll.
-
-1. Ambient deposit&withdraw
-2. Aave deposit&withdraw
-3. LayerBank deposit&withdraw
-
-Перед началом работы необходимо выбрать количество модулей, которые будут использованы максимально для каждого кошелька.
-
-## Модуль Scroll WarmUp
-
-Модуль Scroll WarmUp предоставляет 11 различных модулей для работы с сетью Scroll.
-
-1. Loanshark deposit
-2. Zksynth deposit
-3. Meowprotocol deposit
-4. Punk Swap [random token]
-5. Compound Proxy Allow
-6. Kelpdao deposit
-7. Kelpdao deposit & swap
-8. Compound deposit 
-9. SkyDrome Swap [random token]
-10. CogFinance addLiq
-11. Nfts2me mint [random nft]
-
-Выбрать желаемые модули можно в settings.py
-
-Перед началом работы необходимо выбрать количество модулей, которые будут использованы максимально для каждого кошелька.
-
 ## Модуль ENS Domain Renew
 Проделвает ваши активые ENS домены на 1 год
 
