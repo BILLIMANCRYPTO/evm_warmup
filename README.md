@@ -67,7 +67,7 @@
 
 ## Модуль Scroll WarmUp
 
-Модуль Scroll WarmUp предоставляет 9 различных модулей для работы с сетью Scroll.
+Модуль Scroll WarmUp предоставляет 11 различных модулей для работы с сетью Scroll.
 
 1. Loanshark deposit
 2. Zksynth deposit
